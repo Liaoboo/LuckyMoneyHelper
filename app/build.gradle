@@ -5,7 +5,7 @@ android {
     buildToolsVersion "23.0.3"
 
     defaultConfig {
-        applicationId "luckymoneyhelper.com.luckymoneyhelper"
+        applicationId "com.luckymoneyhelper"
         minSdkVersion 14
         targetSdkVersion 23
         versionCode 1

@@ -1,3 +1,7 @@
 <resources>
-    <string name="app_name">LuckyMoneyHelper</string>
+    <string name="app_name">红包助手</string>
+    <string name="app_service_open">打开抢红包服务</string>
+    <string name="app_service_close">关闭抢红包服务</string>
+    <string name="app_description">亲，必须开启该服务才能自动抢红包喔！</string>
+    <string name="app_error_tip">遇到一些问题,请手动打开系统设置>辅助服务>红包助手(ฅ´ω`ฅ) /n 如果是小米用户，请手动打开系统设置>其他高级设置>无障碍>红包助手(ฅ´ω`ฅ)</string>
 </resources>
