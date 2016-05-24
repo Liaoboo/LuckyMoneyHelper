@@ -56,6 +56,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         boolean unlock = sharedPreferences.getBoolean(Const.IS_UNLOCK, true);
         cb_prompt_tone.setChecked(music);
         cb_unlock.setChecked(unlock);
+//        Handler handler = new Handler(getMainLooper());
+//        handler.postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                KeyguardManager.KeyguardLock kl;
+//                KeyguardManager km = (KeyguardManager) getSystemService(getApplicationContext()
+//                        .KEYGUARD_SERVICE);
+//                kl = km.newKeyguardLock("unlock");
+//
+//                // 把系统锁屏暂时关闭
+//                kl.disableKeyguard();
+//                PowerManager pm = (PowerManager) getSystemService(getApplicationContext()
+//                        .POWER_SERVICE);
+//                PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.ACQUIRE_CAUSES_WAKEUP |
+//                        PowerManager.SCREEN_DIM_WAKE_LOCK, "bright");
+//                wl.acquire();
+//                wl.release();
+//            }
+//        },50000);
     }
 
     public void initListener() {
@@ -89,6 +108,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onAccessibilityStateChanged(boolean enabled) {
+
         updateServiceStatus();
     }
 

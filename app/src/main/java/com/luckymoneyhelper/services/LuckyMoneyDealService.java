@@ -28,7 +28,7 @@ public class LuckyMoneyDealService extends AccessibilityService {
                 if (!texts.isEmpty()) {
                     for (CharSequence text : texts) {
                         String content = text.toString();
-                        Log.i(TAG, "text:" + content);
+//                        Log.i(TAG, "text:" + content);
                         if (content.contains(Const.TYPE_NOTIFICATION_STATE_TIP)) {
                             //模拟打开通知栏消息
                             if (event.getParcelableData() != null && event.getParcelableData() instanceof Notification) {
@@ -64,7 +64,6 @@ public class LuckyMoneyDealService extends AccessibilityService {
     private void robPacket() {
         AccessibilityNodeInfo rootNode = getRootInActiveWindow();
         recycle(rootNode);
-        openPacket();
     }
 
     /**
@@ -91,7 +90,7 @@ public class LuckyMoneyDealService extends AccessibilityService {
         if (info.getChildCount() == 0) {
             if (info.getText() != null) {
                 if (Const.TYPE_VIEW_RECEIVE.equals(info.getText().toString())) {
-                    Log.i(TAG, "Click" + ",isClick:" + info.isClickable());
+//                    Log.i(TAG, "Click" + ",isClick:" + info.isClickable());
                     info.performAction(AccessibilityNodeInfo.ACTION_CLICK);
                     AccessibilityNodeInfo parent = info.getParent();
                     while (parent != null) {
