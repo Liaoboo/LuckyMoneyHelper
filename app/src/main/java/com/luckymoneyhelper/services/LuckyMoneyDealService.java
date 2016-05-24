@@ -12,25 +12,26 @@ import com.luckymoneyhelper.constants.Const;
 
 import java.util.List;
 
-/** 红包服务类
+/**
+ * 红包处理服务类
  * Created by LiaoBo on 2016/5/23.
  */
-public class LuckyMoneyService extends AccessibilityService {
+public class LuckyMoneyDealService extends AccessibilityService {
+    private final String TAG = getClass().getSimpleName();
+
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
         int eventType = event.getEventType();
-        switch (eventType){
+        switch (eventType) {
             case AccessibilityEvent.TYPE_NOTIFICATION_STATE_CHANGED://监听通知栏信息
                 List<CharSequence> texts = event.getText();
                 if (!texts.isEmpty()) {
                     for (CharSequence text : texts) {
                         String content = text.toString();
-                        Log.i("demo", "text:"+content);
+                        Log.i(TAG, "text:" + content);
                         if (content.contains(Const.TYPE_NOTIFICATION_STATE_TIP)) {
                             //模拟打开通知栏消息
-                            if (event.getParcelableData() != null
-                                    &&
-                                    event.getParcelableData() instanceof Notification) {
+                            if (event.getParcelableData() != null && event.getParcelableData() instanceof Notification) {
                                 Notification notification = (Notification) event.getParcelableData();
                                 PendingIntent pendingIntent = notification.contentIntent;
                                 try {
@@ -52,18 +53,20 @@ public class LuckyMoneyService extends AccessibilityService {
                     //开始打开红包
                     openPacket();
                 }
-            break;
+                break;
         }
     }
 
     /**
-     *抢红包
+     * 抢红包
      */
     @SuppressLint("NewApi")
     private void robPacket() {
         AccessibilityNodeInfo rootNode = getRootInActiveWindow();
         recycle(rootNode);
+        openPacket();
     }
+
     /**
      * 打开红包
      */
@@ -71,8 +74,7 @@ public class LuckyMoneyService extends AccessibilityService {
     private void openPacket() {
         AccessibilityNodeInfo nodeInfo = getRootInActiveWindow();
         if (nodeInfo != null) {
-            List<AccessibilityNodeInfo> list = nodeInfo
-                    .findAccessibilityNodeInfosByText("抢红包");
+            List<AccessibilityNodeInfo> list = nodeInfo.findAccessibilityNodeInfosByText("抢红包");
             for (AccessibilityNodeInfo n : list) {
                 n.performAction(AccessibilityNodeInfo.ACTION_CLICK);
             }
@@ -81,20 +83,20 @@ public class LuckyMoneyService extends AccessibilityService {
 
     /**
      * 打印一个节点的结构
+     *
      * @param info
      */
     @SuppressLint("NewApi")
     public void recycle(AccessibilityNodeInfo info) {
         if (info.getChildCount() == 0) {
-            if(info.getText() != null){
-                if(Const.TYPE_VIEW_RECEIVE.equals(info.getText().toString())){
-                    //这里有一个问题需要注意，就是需要找到一个可以点击的View
-                    Log.i("demo", "Click"+",isClick:"+info.isClickable());
+            if (info.getText() != null) {
+                if (Const.TYPE_VIEW_RECEIVE.equals(info.getText().toString())) {
+                    Log.i(TAG, "Click" + ",isClick:" + info.isClickable());
                     info.performAction(AccessibilityNodeInfo.ACTION_CLICK);
                     AccessibilityNodeInfo parent = info.getParent();
-                    while(parent != null){
-                        Log.i("demo", "parent isClick:"+parent.isClickable());
-                        if(parent.isClickable()){
+                    while (parent != null) {
+                        Log.i("demo", "parent isClick:" + parent.isClickable());
+                        if (parent.isClickable()) {
                             parent.performAction(AccessibilityNodeInfo.ACTION_CLICK);
                             break;
                         }
@@ -106,7 +108,7 @@ public class LuckyMoneyService extends AccessibilityService {
 
         } else {
             for (int i = 0; i < info.getChildCount(); i++) {
-                if(info.getChild(i)!=null){
+                if (info.getChild(i) != null) {
                     recycle(info.getChild(i));
                 }
             }

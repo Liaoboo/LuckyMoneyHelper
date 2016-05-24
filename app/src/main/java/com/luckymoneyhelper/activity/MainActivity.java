@@ -3,24 +3,31 @@ package com.luckymoneyhelper.activity;
 import android.accessibilityservice.AccessibilityServiceInfo;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.accessibility.AccessibilityManager;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.Toast;
 
 import com.luckymoneyhelper.R;
+import com.luckymoneyhelper.constants.Const;
+import com.luckymoneyhelper.services.LuckyMoneyMonitorService;
 
 import java.util.List;
 
 /**
  * 主函数
  */
-public class MainActivity extends AppCompatActivity implements View.OnClickListener, AccessibilityManager.AccessibilityStateChangeListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, AccessibilityManager.AccessibilityStateChangeListener,CompoundButton.OnCheckedChangeListener {
     private Button btn_open_close;
-    private AccessibilityManager mAaccessibilityManager;  //无障碍服务 管理
+    private AccessibilityManager mAaccessibilityManager;  //无障碍服务管理
+    private CheckBox cb_prompt_tone,cb_unlock;
+    private SharedPreferences.Editor editor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,26 +40,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public void initViews() {
         btn_open_close = (Button) findViewById(R.id.btn_open_close);
+        cb_prompt_tone = (CheckBox) findViewById(R.id.cb_prompt_tone);
+        cb_unlock = (CheckBox) findViewById(R.id.cb_unlock);
     }
 
     public void initParams() {
         mAaccessibilityManager = (AccessibilityManager) getSystemService(Context.ACCESSIBILITY_SERVICE);
         updateServiceStatus();
+        // 开启服务
+        Intent intent = new Intent(MainActivity.this, LuckyMoneyMonitorService.class);
+        startService(intent);
+        SharedPreferences sharedPreferences = getSharedPreferences(Const.CONFIG, MODE_PRIVATE);
+        editor = sharedPreferences.edit();
+        boolean music = sharedPreferences.getBoolean(Const.IS_PROMPT_TONE, true);
+        boolean unlock = sharedPreferences.getBoolean(Const.IS_UNLOCK, true);
+        cb_prompt_tone.setChecked(music);
+        cb_unlock.setChecked(unlock);
     }
 
     public void initListener() {
         btn_open_close.setOnClickListener(this);
+        cb_prompt_tone.setOnCheckedChangeListener(this);
+        cb_unlock.setOnCheckedChangeListener(this);
         mAaccessibilityManager.addAccessibilityStateChangeListener(this);
-    }
-
-
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.btn_open_close:
-                intentSet();
-                break;
-        }
     }
 
     @Override
@@ -61,6 +71,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mAaccessibilityManager.removeAccessibilityStateChangeListener(this);
         super.onDestroy();
     }
+
+
 
     /**
      *  跳转设置
@@ -81,7 +93,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     /**
-     * 更新当前 LuckyMoneyService 显示状态
+     * 更新当前 LuckyMoneyDealService 显示状态
      */
     private void updateServiceStatus() {
         if (isServiceEnabled()) {
@@ -92,7 +104,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     /**
-     * 获取 LuckyMoneyService 是否启用
+     * 获取 LuckyMoneyDealService 是否启用
      *
      * @return
      */
@@ -100,10 +112,33 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         List<AccessibilityServiceInfo> accessibilityServices =
                 mAaccessibilityManager.getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_GENERIC);
         for (AccessibilityServiceInfo info : accessibilityServices) {
-            if (info.getId().equals(getPackageName() + "/.services.LuckyMoneyService")) {
+            if (info.getId().equals(getPackageName() + "/.services.LuckyMoneyDealService")) {
                 return true;
             }
         }
         return false;
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.btn_open_close:
+                intentSet();
+                break;
+        }
+    }
+
+    @Override
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        switch (buttonView.getId()) {
+            case R.id.cb_prompt_tone:
+                editor.putBoolean(Const.IS_PROMPT_TONE, isChecked);
+                editor.commit();
+                break;
+            case R.id.cb_unlock:
+                editor.putBoolean(Const.IS_UNLOCK, isChecked);
+                editor.commit();
+                break;
+        }
     }
 }
