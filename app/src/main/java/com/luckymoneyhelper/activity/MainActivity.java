@@ -26,7 +26,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, AccessibilityManager.AccessibilityStateChangeListener,CompoundButton.OnCheckedChangeListener {
     private Button btn_open_close;
     private AccessibilityManager mAaccessibilityManager;  //无障碍服务管理
-    private CheckBox cb_prompt_tone,cb_unlock;
+    private CheckBox cb_prompt_tone,cb_unlock,cb_super;
     private SharedPreferences.Editor editor;
 
     @Override
@@ -42,6 +42,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btn_open_close = (Button) findViewById(R.id.btn_open_close);
         cb_prompt_tone = (CheckBox) findViewById(R.id.cb_prompt_tone);
         cb_unlock = (CheckBox) findViewById(R.id.cb_unlock);
+        cb_super = (CheckBox) findViewById(R.id.cb_super);
     }
 
     public void initParams() {
@@ -53,34 +54,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         SharedPreferences sharedPreferences = getSharedPreferences(Const.CONFIG, MODE_PRIVATE);
         editor = sharedPreferences.edit();
         boolean music = sharedPreferences.getBoolean(Const.IS_PROMPT_TONE, true);
-        boolean unlock = sharedPreferences.getBoolean(Const.IS_UNLOCK, true);
+        boolean unlock = sharedPreferences.getBoolean(Const.IS_UNLOCK, false);
+        boolean super_modle = sharedPreferences.getBoolean(Const.IS_SUPER_MODEL, false);
         cb_prompt_tone.setChecked(music);
         cb_unlock.setChecked(unlock);
-//        Handler handler = new Handler(getMainLooper());
-//        handler.postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                KeyguardManager.KeyguardLock kl;
-//                KeyguardManager km = (KeyguardManager) getSystemService(getApplicationContext()
-//                        .KEYGUARD_SERVICE);
-//                kl = km.newKeyguardLock("unlock");
-//
-//                // 把系统锁屏暂时关闭
-//                kl.disableKeyguard();
-//                PowerManager pm = (PowerManager) getSystemService(getApplicationContext()
-//                        .POWER_SERVICE);
-//                PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.ACQUIRE_CAUSES_WAKEUP |
-//                        PowerManager.SCREEN_DIM_WAKE_LOCK, "bright");
-//                wl.acquire();
-//                wl.release();
-//            }
-//        },50000);
+        cb_super.setChecked(super_modle);
     }
 
     public void initListener() {
         btn_open_close.setOnClickListener(this);
         cb_prompt_tone.setOnCheckedChangeListener(this);
         cb_unlock.setOnCheckedChangeListener(this);
+        cb_super.setOnCheckedChangeListener(this);
         mAaccessibilityManager.addAccessibilityStateChangeListener(this);
     }
 
@@ -157,6 +142,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.cb_unlock:
                 editor.putBoolean(Const.IS_UNLOCK, isChecked);
+                editor.commit();
+                break;
+            case R.id.cb_super:
+                editor.putBoolean(Const.IS_SUPER_MODEL, isChecked);
                 editor.commit();
                 break;
         }

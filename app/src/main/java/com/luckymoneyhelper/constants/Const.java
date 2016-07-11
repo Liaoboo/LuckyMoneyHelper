@@ -14,4 +14,5 @@ public final class Const {
     public static final String CONFIG = "config";
     public static final String IS_PROMPT_TONE = "is_prompt_tone";//是否播放提示音
     public static final String IS_UNLOCK = "is_unlock";//是否点亮屏幕并解锁解锁
+    public static final String IS_SUPER_MODEL = "is_super_model";//是否启动超级模式（自动抢并且自动拆）
 }

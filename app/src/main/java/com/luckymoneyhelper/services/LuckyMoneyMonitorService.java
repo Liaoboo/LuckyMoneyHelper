@@ -1,5 +1,6 @@
 package com.luckymoneyhelper.services;
 
+import android.annotation.TargetApi;
 import android.app.KeyguardManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -8,6 +9,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.media.MediaPlayer;
+import android.os.Build;
 import android.os.PowerManager;
 import android.service.notification.NotificationListenerService;
 import android.service.notification.StatusBarNotification;
@@ -19,6 +21,7 @@ import com.luckymoneyhelper.constants.Const;
  * 红包监听
  * Created by LiaoBo on 2016/5/24.
  */
+@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 public class LuckyMoneyMonitorService extends NotificationListenerService {
     private KeyguardManager.KeyguardLock kl;
 
@@ -31,7 +34,7 @@ public class LuckyMoneyMonitorService extends NotificationListenerService {
                 && sbn.getPackageName ().equals(Const.TYPE_PACKAGE_NAME)) {
 
             // 读取设置信息，判断是否该点亮屏幕并解开锁屏，解锁的原理是把锁屏关闭掉
-            if (sharedPreferences.getBoolean(Const.IS_UNLOCK, true)) {
+            if (sharedPreferences.getBoolean(Const.IS_UNLOCK, false)) {
                 KeyguardManager km = (KeyguardManager) getSystemService(getApplicationContext()
                         .KEYGUARD_SERVICE);
                 kl = km.newKeyguardLock("unlock");
@@ -44,6 +47,12 @@ public class LuckyMoneyMonitorService extends NotificationListenerService {
                         PowerManager.SCREEN_DIM_WAKE_LOCK, "bright");
                 wl.acquire();
                 wl.release();
+
+                // 监听系统广播，如果屏幕熄灭就把系统锁屏还原
+                IntentFilter intentFilter = new IntentFilter();
+                intentFilter.addAction("android.intent.action.SCREEN_OFF");
+                ScreenOffReceiver screenOffReceiver = new ScreenOffReceiver();
+                registerReceiver(screenOffReceiver, intentFilter);
             }
 
             try {
@@ -59,12 +68,6 @@ public class LuckyMoneyMonitorService extends NotificationListenerService {
                 MediaPlayer mediaPlayer = new MediaPlayer().create(this, R.raw.hongbao_arrived);
                 mediaPlayer.start();
             }
-
-            // 监听系统广播，如果屏幕熄灭就把系统锁屏还原
-            IntentFilter intentFilter = new IntentFilter();
-            intentFilter.addAction("android.intent.action.SCREEN_OFF");
-            ScreenOffReceiver screenOffReceiver = new ScreenOffReceiver();
-            registerReceiver(screenOffReceiver, intentFilter);
 
         }
 

@@ -4,6 +4,7 @@ import android.accessibilityservice.AccessibilityService;
 import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.PendingIntent;
+import android.content.SharedPreferences;
 import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
@@ -49,6 +50,10 @@ public class LuckyMoneyDealService extends AccessibilityService {
                 if (className.equals("com.tencent.mm.ui.LauncherUI")) {
                     //开始抢红包
                     robPacket();
+                    //如果开启了超级模式就抢到后拆红包
+                    if (getSharedPreferences(Const.CONFIG, MODE_PRIVATE).getBoolean(Const.IS_SUPER_MODEL, false)) {
+                        openPacket();
+                    }
                 } else if (className.equals("com.tencent.mm.plugin.luckymoney.ui.LuckyMoneyReceiveUI")) {
                     //开始打开红包
                     openPacket();
@@ -94,7 +99,7 @@ public class LuckyMoneyDealService extends AccessibilityService {
                     info.performAction(AccessibilityNodeInfo.ACTION_CLICK);
                     AccessibilityNodeInfo parent = info.getParent();
                     while (parent != null) {
-                        Log.i("demo", "parent isClick:" + parent.isClickable());
+//                        Log.i("demo", "parent isClick:" + parent.isClickable());
                         if (parent.isClickable()) {
                             parent.performAction(AccessibilityNodeInfo.ACTION_CLICK);
                             break;
